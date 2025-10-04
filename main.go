@@ -23,8 +23,8 @@ func main() {
     app.Get("/", func(c *fiber.Ctx) error {
         return c.Render("index", fiber.Map{
             "Title": "Website Sekolah",
-            "Body":  "Selamat datang",
-        })
+            "Body":  "Selamat datang", 
+        }, "layouts/main")
     })
 
     app.Listen(":3000")
