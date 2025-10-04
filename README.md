@@ -60,3 +60,14 @@ Server dapat dijalankan secara manual, alias tidak ada live reloading. Biasanya 
 ```sh
 go run main.go
 ```
+
+## Tailwind
+Terlebih dahulu pasang dependensinya
+```
+$ npm install
+```
+
+Untuk membangun cssnya, jalankan perintah berikut
+```
+$ npm run build:css
+```
