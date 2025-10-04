@@ -1,1 +1,12 @@
+@import url(/woff2/inter.css);
+@import url(/woff2/roboto-mono.css);
 @import "tailwindcss";
+
+h1 {
+    font-family: "Inter";
+    font-feature-settings: "cv05" 1, "cv08" 1, "cv09" 1, "cv02" 1, "cv10" 1, "tnum" 1, "zero" 1, "ss07" 1, "calt" 1;
+}
+
+.roboto-mono {
+    font-family: "Roboto Mono";
+}
