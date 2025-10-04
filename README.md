@@ -18,7 +18,19 @@ Praktik baik yaitu mengunduh dan merapikan keperluan dependensi. Maka dari itu l
 $ go mod tidy
 ```
 
-Terakhir, jalankan websitenya. Biasanya berada di http://127.0.0.1:3000
+Pasang paket dibawah agar perubahan dapat ditampilkan langsung tanpa restart server.
+
+```sh
+$ go install github.com/air-verse/air@latest
+```
+
+Terakhir jalankan servernya
+
+```sh
+$ air
+```
+
+Server dapat dijalankan secara manual, alias tidak ada live reloading. Biasanya berada di http://127.0.0.1:3000
 ```sh
 $ go run main.go
 ```
@@ -29,10 +41,22 @@ Sebelumnya terlebih dahulu klon repositori ini, dan pasang `go`. Versi 1.17 keat
 
 Praktik baik yaitu mengunduh dan merapikan keperluan dependensi. Maka dari itu lakukan berikut.
 ```sh
-$ go mod tidy
+go mod tidy
 ```
 
-Terakhir, jalankan websitenya. Biasanya berada di http://127.0.0.1:3000
+Pasang paket dibawah agar perubahan dapat ditampilkan langsung tanpa restart server.
+
 ```sh
-$ go run main.go
+go install github.com/air-verse/air@latest
+```
+
+Terakhir jalankan servernya
+
+```sh
+air
+```
+
+Server dapat dijalankan secara manual, alias tidak ada live reloading. Biasanya berada di http://127.0.0.1:3000
+```sh
+go run main.go
 ```
