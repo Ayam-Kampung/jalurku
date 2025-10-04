@@ -3,7 +3,7 @@ name: Build Tailwind CSS
 on:
   push:
     branches:
-      - main  # runs when you push to main branch
+      - main
 
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
         run: npm run build:css
 
       - name: Upload built CSS
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: tailwind-css
           path: static/css/output.css
