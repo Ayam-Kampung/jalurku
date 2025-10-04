@@ -1,9 +1,1 @@
-body {
-  font-family: sans-serif;
-  background: #f9f9f9;
-  padding: 2rem;
-}
-
-h1 {
-  color: #2c3e50;
-}
+@import "tailwindcss";

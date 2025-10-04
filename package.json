@@ -1,0 +1,21 @@
+{
+  "name": "jalurku",
+  "version": "1.0.0",
+  "description": "Website untuk JHIC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ayam-Kampung/jalurku.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "npx @tailwindcss/cli -i static/css/style.css -o static/css/output.css --watch --minify"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.14",
+    "tailwindcss": "^4.1.14"
+  }
+}
