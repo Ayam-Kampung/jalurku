@@ -22,8 +22,7 @@ func main() {
 	// Kita mengubah {{.Title}} menjadi "Website Sekolah"
     app.Get("/", func(c *fiber.Ctx) error {
         return c.Render("index", fiber.Map{
-            "Title": "SMK TELKOM PURWOKERTO",
-            "Body":  "Selamat datang", 
+            "Title": "Ayam Kampung—Beranda",
         }, "layouts/main")
     })
 
