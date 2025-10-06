@@ -38,5 +38,10 @@ func main() {
 		}, "layouts/main")
 	})
 
+	app.Use(func(c *fiber.Ctx) error {
+        return c.Render("404", fiber.Map{
+		}, "layouts/main")
+    })
+
 	app.Listen(":3000")
 }
