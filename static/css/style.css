@@ -1,10 +1,5 @@
 @import url(/woff2/inter.css);
 @import url(/woff2/roboto-mono.css);
-@import "tailwindcss";
-
-@theme {  
-    --color-merah: #F22338;
-}
 
 .inter {
     font-family: "Inter";
