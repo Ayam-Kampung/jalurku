@@ -9,3 +9,19 @@
 .roboto-mono {
     font-family: "Roboto Mono";
 }
+
+.clip-diagonal {
+    clip-path: none;
+}
+
+/* Di layar besar: gambar miring */
+@media (min-width: 768px) {
+    .clip-diagonal-1 {
+        clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
+    }
+
+    /* Dari kanan ke kiri */
+    .clip-diagonal-2 {
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 20% 100%);
+    }
+}
