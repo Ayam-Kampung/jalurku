@@ -1,15 +1,161 @@
-<nav class="flex items-center justify-between px-5 py-5">
-  <div class="roboto-mono text-sm flex items-center gap-5">
+<nav class="flex items-center justify-between px-5 py-5 bg-white shadow-md relative">
+  <div class="roboto-mono text-sm flex items-center gap-3">
     <img src="/images/Logo-SMK.png" alt="Logo SMK TELKOM" class="h-8">
-    <a href="/">BERANDA</a>
   </div>
-  <div class="hidden lg:flex roboto-mono text-sm items-center gap-10">
-    <a href="/jelajah">JELAJAH</a>
-    <a href="/jurusan">JURUSAN</a>
-    <a href="/tentang">TENTANG</a>
-    <a href="/hubungi">HUBUNGI</a>
-  </div>
-  <div class="lg:hidden flex roboto-mono text-sm items-center gap-10">
-    <a href="/jelajah">MENU</a>
+
+  <!-- Tombol Hamburger -->
+  <button id="menuBtn" class="lg:hidden flex flex-col justify-center items-center gap-[6px]">
+    <span class="block w-6 h-[2px] bg-gray-800 transition-all"></span>
+    <span class="block w-6 h-[2px] bg-gray-800 transition-all"></span>
+    <span class="block w-6 h-[2px] bg-gray-800 transition-all"></span>
+  </button>
+
+  <!-- Menu Utama -->
+  <div id="navMenu"
+    class="hidden lg:flex flex-col lg:flex-row roboto-mono text-sm items-start lg:items-center gap-6 lg:gap-10 absolute lg:static top-20 left-0 w-full lg:w-auto bg-white lg:bg-transparent shadow-lg lg:shadow-none px-5 py-4 lg:p-0 z-40">
+
+    <!-- BERANDA -->
+    <a href="/" class="block w-full lg:w-auto hover:text-red-600 py-2 border-b lg:border-none">BERANDA</a>
+
+    <!-- JELAJAH -->
+    <a href="https://tour.smktelkom-pwt.sch.id/" class="block w-full lg:w-auto hover:text-red-600 py-2 border-b lg:border-none">JELAJAH</a>
+
+    <!-- JURUSAN -->
+    <div class="w-full lg:w-auto relative">
+      <button id="jurusanBtn"
+        class="flex justify-between w-full lg:w-auto items-center hover:text-red-600 py-2 border-b lg:border-none transition-colors">
+        JURUSAN
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <div id="jurusanDropdown"
+        class="hidden lg:absolute lg:right-0 mt-2 w-full lg:w-32 bg-gray-50 rounded-md shadow-lg border border-gray-200 
+        opacity-0 scale-95 transition-all duration-300 ease-out origin-top z-30">
+        <a href="/jurusan/rpl" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 border-b border-gray-200">
+          <div class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">RPL</div>
+        </a>
+         <a href="/jurusan/pg" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100">
+          <div class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">PG</div>
+        </a>
+        <a href="/jurusan/tkj" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 border-b border-gray-200">
+          <div class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded flex items-center gap-2">TKJ
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffff"><path d="M480-80q-33 0-56.5-23.5T400-160q0-21 11-39t29-29v-92H320q-33 0-56.5-23.5T240-400v-92q-18-9-29-27t-11-41q0-33 23.5-56.5T280-640q33 0 56.5 23.5T360-560q0 23-11 40t-29 28v92h120v-320h-80l120-160 120 160h-80v320h120v-80h-40v-160h160v160h-40v80q0 33-23.5 56.5T640-320H520v92q19 10 29.5 28t10.5 40q0 33-23.5 56.5T480-80Z"/></svg>
+          </div>
+        </a>
+        <a href="/jurusan/tja" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 border-b border-gray-200">
+          <div class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">TJA</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- TENTANG -->
+    <div class="w-full lg:w-auto relative">
+      <button id="tentangBtn"
+        class="flex justify-between w-full lg:w-auto items-center hover:text-red-600 py-2 border-b lg:border-none transition-colors">
+        TENTANG
+        <!-- <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg> -->
+      </button>
+
+      <div id="tentangDropdown"
+        class="hidden lg:absolute lg:right-0 mt-2 w-full lg:w-48 bg-gray-50 rounded-md shadow-lg border border-gray-200 
+        opacity-0 scale-95 transition-all duration-300 ease-out origin-top z-30">
+        <a href="/tentang/sekolah" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-200">Tentang Sekolah</a>
+        <a href="/tentang/visi-misi" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-200">Visi & Misi</a>
+        <a href="/tentang/prestasi" class="block px-4 py-2 hover:bg-gray-100">Prestasi</a>
+      </div>
+    </div>
+
+    <!-- HUBUNGI -->
+    <div class="w-full lg:w-auto relative">
+      <button id="hubungiBtn"
+        class="flex justify-between w-full lg:w-auto items-center hover:text-red-600 py-2 border-b lg:border-none transition-colors">
+        HUBUNGI
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <div id="hubungiDropdown"
+        class="hidden lg:absolute lg:right-0 mt-2 w-full lg:w-36 bg-gray-50 rounded-md shadow-lg border border-gray-200 
+        opacity-0 scale-95 transition-all duration-300 ease-out origin-top z-30">
+        <a href="/faqs" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-200">FAQs</a>
+        <a href="/pertanyaan" class="block px-4 py-2 hover:bg-gray-100">Kirim Pertanyaan</a>
+      </div>
+    </div>
   </div>
 </nav>
+
+<script>
+  const dropdowns = [
+    { btn: 'jurusanBtn', menu: 'jurusanDropdown' },
+    { btn: 'tentangBtn', menu: 'tentangDropdown' },
+    { btn: 'hubungiBtn', menu: 'hubungiDropdown' }
+  ];
+
+  // === Fungsi toggle dropdown ===
+  function toggleDropdown(menuId) {
+    dropdowns.forEach(({ menu }) => {
+      const el = document.getElementById(menu);
+      const isOpen = !el.classList.contains('hidden');
+
+      if (menu === menuId) {
+        if (window.innerWidth < 1024) {
+          // 📱 MOBILE MODE - Accordion style
+          if (isOpen) {
+            el.classList.add('hidden');
+          } else {
+            el.classList.remove('hidden', 'opacity-0', 'scale-95');
+            el.classList.add('block', 'opacity-100', 'scale-100');
+          }
+        } else {
+          // 💻 DESKTOP MODE - Floating dropdown
+          if (isOpen) {
+            el.classList.remove('opacity-100', 'scale-100');
+            el.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => el.classList.add('hidden'), 150);
+          } else {
+            el.classList.remove('hidden', 'opacity-0', 'scale-95');
+            el.classList.add('block', 'opacity-100', 'scale-100');
+          }
+        }
+      } else {
+        // Tutup dropdown lain
+        el.classList.remove('opacity-100', 'scale-100');
+        el.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => el.classList.add('hidden'), 150);
+      }
+    });
+  }
+
+  // Event klik tombol dropdown
+  dropdowns.forEach(({ btn, menu }) => {
+    document.getElementById(btn).addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleDropdown(menu);
+    });
+  });
+
+  // Klik di luar dropdown untuk menutup
+  document.addEventListener('click', () => {
+    if (window.innerWidth >= 1024) {
+      dropdowns.forEach(({ menu }) => {
+        const el = document.getElementById(menu);
+        el.classList.remove('opacity-100', 'scale-100');
+        el.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => el.classList.add('hidden'), 150);
+      });
+    }
+  });
+
+  // === Tombol Hamburger ===
+  const menuBtn = document.getElementById('menuBtn');
+  const navMenu = document.getElementById('navMenu');
+  menuBtn.addEventListener('click', () => {
+    navMenu.classList.toggle('hidden');
+    navMenu.classList.toggle('flex');
+  });
+</script>
