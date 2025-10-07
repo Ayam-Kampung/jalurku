@@ -40,6 +40,7 @@ func main() {
 
 	app.Use(func(c *fiber.Ctx) error {
         return c.Render("404", fiber.Map{
+			"Title": "Ayam Kampung—404",
 		}, "layouts/main")
     })
 
