@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "jalurku: Tailwind watch",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev:css"
+    },
+    {
+      "name": "jalurku: Fiber Dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "fiber dev"
+    },
+  ],
+  "compounds": [
+    {
+      "name": "jalurku: Full Dev",
+      "configurations": ["jalurku: Fiber Dev", "jalurku: Tailwind watch"],
+      "stopAll": true
+    }
+  ]
+}
