@@ -13,11 +13,17 @@
       "request": "launch",
       "command": "fiber dev"
     },
+    {
+      "name": "jalurku: esbuild Dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev"
+    },
   ],
   "compounds": [
     {
       "name": "jalurku: Full Dev",
-      "configurations": ["jalurku: Fiber Dev", "jalurku: Tailwind watch"],
+      "configurations": ["jalurku: Fiber Dev", "jalurku: Tailwind watch", "jalurku: esbuild Dev"],
       "stopAll": true
     }
   ]
