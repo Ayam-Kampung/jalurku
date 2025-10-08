@@ -16,14 +16,25 @@ gsap.from("#slideText", {
     x: -300,
     opacity: 0,
     duration: 2,
-    ease: "power1.inOut",
-    stagger: 0.5
+    ease: "power2.Out",
 })
 
 gsap.from("#slideImages", {
     x: 300,
     opacity: 0,
     duration: 2,
-    ease: "power1.inOut",
-    stagger: 0.5
+    ease: "power2.Out",
+})
+
+gsap.from("#fadeIn", {
+    opacity: 0,
+    duration: 3,
+    ease: "power2.Out",
+})
+
+gsap.from("#zoom", {
+    scale: 0,
+    opacity: 0,
+    duration: 1.5,
+    ease: "power2.Out",
 })

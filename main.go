@@ -38,6 +38,24 @@ func main() {
 		}, "layouts/main")
 	})
 
+	app.Get("/rencanaku/tja", func(c *fiber.Ctx) error {
+		return c.Render("tja", fiber.Map{
+			"Title": "Ayam Kampung—RencanaKu",
+		}, "layouts/main")
+	})
+
+	app.Get("/rencanaku/tkj", func(c *fiber.Ctx) error {
+		return c.Render("tkj", fiber.Map{
+			"Title": "Ayam Kampung—RencanaKu",
+		}, "layouts/main")
+	})
+
+	app.Get("/rencanaku/pg", func(c *fiber.Ctx) error {
+		return c.Render("pg", fiber.Map{
+			"Title": "Ayam Kampung—RencanaKu",
+		}, "layouts/main")
+	})
+
 	app.Use(func(c *fiber.Ctx) error {
         return c.Render("404", fiber.Map{
 			"Title": "Ayam Kampung—404",
