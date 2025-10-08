@@ -40,6 +40,24 @@ func SetupRoutes(app *fiber.App) {
 		}, "layouts/main")
 	})
 
+	rencanaku.Get("/tja", func(c *fiber.Ctx) error {
+		return c.Render("tja", fiber.Map{
+			"Title": "Ayam Kampung—RencanaKu",
+		}, "layouts/main")
+	})
+
+	rencanaku.Get("/tkj", func(c *fiber.Ctx) error {
+		return c.Render("tkj", fiber.Map{
+			"Title": "Ayam Kampung—RencanaKu",
+		}, "layouts/main")
+	})
+
+	rencanaku.Get("/pg", func(c *fiber.Ctx) error {
+		return c.Render("pg", fiber.Map{
+			"Title": "Ayam Kampung—RencanaKu",
+		}, "layouts/main")
+	})
+
 	rencanaku.Get("/rpl", func(c *fiber.Ctx) error {
 		return c.Render("rpl", fiber.Map{
 			"Title": "Ayam Kampung—RencanaKu",
