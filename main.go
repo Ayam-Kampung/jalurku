@@ -1,7 +1,11 @@
 package main
 
 import (
+	"jalurku/app/db"
+	"jalurku/app/router"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/template/html/v2"
 )
 
@@ -15,52 +19,13 @@ func main() {
 		Views: engine,
 	})
 
-	// Menyediakan file static seperti .css, .js, dll
 	app.Static("/", "./static")
 
-	// Rute / (root)
-	// Kita mengubah {{.Title}} menjadi "Website Sekolah"
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{
-			"Title": "Ayam Kampung—Beranda",
-		}, "layouts/main")
-	})
+	app.Use(cors.New())
 
-	app.Get("/rencanaku", func(c *fiber.Ctx) error {
-		return c.Render("rencanaku", fiber.Map{
-			"Title": "Ayam Kampung—RencanaKu",
-		}, "layouts/main")
-	})
+	database.ConnectDB()
 
-	app.Get("/rencanaku/rpl", func(c *fiber.Ctx) error {
-		return c.Render("rpl", fiber.Map{
-			"Title": "Ayam Kampung—RencanaKu",
-		}, "layouts/main")
-	})
-
-	app.Get("/rencanaku/tja", func(c *fiber.Ctx) error {
-		return c.Render("tja", fiber.Map{
-			"Title": "Ayam Kampung—RencanaKu",
-		}, "layouts/main")
-	})
-
-	app.Get("/rencanaku/tkj", func(c *fiber.Ctx) error {
-		return c.Render("tkj", fiber.Map{
-			"Title": "Ayam Kampung—RencanaKu",
-		}, "layouts/main")
-	})
-
-	app.Get("/rencanaku/pg", func(c *fiber.Ctx) error {
-		return c.Render("pg", fiber.Map{
-			"Title": "Ayam Kampung—RencanaKu",
-		}, "layouts/main")
-	})
-
-	app.Use(func(c *fiber.Ctx) error {
-        return c.Render("404", fiber.Map{
-			"Title": "Ayam Kampung—404",
-		}, "layouts/main")
-    })
+	router.SetupRoutes(app)
 
 	app.Listen(":3000")
 }
