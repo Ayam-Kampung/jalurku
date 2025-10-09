@@ -8,7 +8,7 @@ import (
 	"jalurku/config"
 	"jalurku/database"
 	"jalurku/model"
-	"jalurku/router"
+	"jalurku/route"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -95,7 +95,7 @@ func main() {
 	app.Use(cors.New(corsConfig))
 
 	// Setup routes
-	routes.SetupRoutes(app)
+	route.SetupRoutes(app)
 
 	// Health check endpoint (useful for cloud platforms)
 	app.Get("/health", func(c *fiber.Ctx) error {

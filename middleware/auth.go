@@ -34,13 +34,14 @@ func jwtError(c *fiber.Ctx, err error) error {
 	})
 }
 
-// AdminOnly middleware untuk authorization (hanya admin)
+// Middleware untuk authorization (hanya admin)
 func AdminOnly() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		user := c.Locals("user").(*jwt.Token)
 		claims := user.Claims.(jwt.MapClaims)
 		role := claims["role"].(string)
 
+		// Role admin
 		if role != "admin" {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 				"status":  "error",
