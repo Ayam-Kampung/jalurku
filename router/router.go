@@ -10,7 +10,7 @@ import (
 // SetupRoutes setup all application routes
 func SetupRoutes(app *fiber.App) {
 	// API Group
-	api := app.Group("/api")
+	api := app.Group("/api", middleware.ApiKey())
 
 	// Health check
 	api.Get("/", controller.Hello)

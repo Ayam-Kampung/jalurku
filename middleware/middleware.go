@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"jalurku/config"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v3"
@@ -45,6 +46,32 @@ func AdminOnly() fiber.Handler {
 				"status":  "error",
 				"message": "Access denied. Admin only",
 				"data":    nil,
+			})
+		}
+
+		return c.Next()
+	}
+}
+
+// Harus menyediakan X-API-KEY di header
+func ApiKey() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		clientKey := c.Get("X-API-Key")
+		serverKey := os.Getenv("API_KEY")
+
+		if clientKey == "" {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"status": "error",
+				"error": "Missing API key",
+				"data": nil,
+			})
+		}
+
+		if clientKey != serverKey {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"status": "error",
+				"error": "Invalid API key",
+				"data": nil,
 			})
 		}
 
