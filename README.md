@@ -1,74 +1,94 @@
 # jalurku
-Website untuk JHIC
 
-## Reproduksi
-Untuk reproduksi lokal intinya:
-- Menjalankan server melalui `fiber serve`, lalu
-- Membangun Tailwind melalui `npm run dev:css`
+## 🚀 Quick Start
 
-### Jagoan Cloud
-`jalurku` sudah dideploy melalui Jagoan Cloud, untuk mensinkronkan, ikuti langkah berikut.
+Sebelumnya untuk reproduksi lokal buatlah kontainer database menggunakan docker, podman, atau semacamnya. Dengan opsi variabel berikut
+- https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/
 
-`jalurku > Deployments > ROOT > Update from GIT` 
+```env
+POSTGRES_USER=myuser
+POSTGRES_PASSWORD=mypassword
+POSTGRES_NAME=mydb
+```
+Variabel diatas didapatkan dari `.env` di akar proyek.
 
-![Update from GIT](jagoan.png)
+Terakhir jalankan dengan:
 
-### Linux/MacOS/Mirip-UNIX
-Sebelumnya terlebih dahulu klon repositori ini, dan pasang `go` sesuai dengan cara pemasagan paket pada setiap sistem operasi.
-
-Praktik baik yaitu mengunduh dan merapikan keperluan dependensi. Maka dari itu lakukan langkah berikut.
-```sh
-$ go mod tidy
+```bash
+go run main.go
 ```
 
-Sebelumnya tambahkan `$(go env GOPATH)/bin:$PATH` dalam `PATH` kamu, agar koleksi paket yang kita pasang melalui `go install` dapat dipanggil secara mudah.
-```
-~/.bashrc
----
-PATH=$(go env GOPATH)/bin:$PATH
-```
+## API
 
-Pasang `fiber` pada sistemmu, berguna karena terdapat fitur *live-reload*, khusus untuk lokal saja.
-```sh
-$ go install github.com/gofiber/cli/fiber@latest
-```
+### Autentikasi
 
-Terakhir jalankan servernya
+#### Registrasi
+```http
+POST /api/auth/register
+Content-Type: application/json
 
-```sh
-$ fiber dev
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
 ```
 
-### Windows/NT
-Sebelumnya terlebih dahulu klon repositori ini, dan pasang `go`. Versi 1.17 keatas.
-- https://go.dev/dl/ 
+#### Log Masuk
+```http
+POST /api/auth/login
+Content-Type: application/json
 
-Praktik baik yaitu mengunduh dan merapikan keperluan dependensi. Maka dari itu lakukan berikut.
-```sh
-go mod tidy
+{
+  "identity": "john@example.com",
+  "password": "password123"
+}
 ```
 
-Pasang `fiber` pada sistemmu, berguna karena terdapat fitur *live-reload*, khusus untuk lokal saja.
-```sh
-go install github.com/gofiber/cli/fiber@latest
+Response:
+```json
+{
+  "status": "success",
+  "message": "Success login",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "uuid",
+      "username": "John Doe",
+      "email": "john@example.com",
+      "role": "user"
+    }
+  }
+}
 ```
 
-Terakhir jalankan servernya
+### Manajemen pengguna
 
-```sh
-fiber dev
+#### Mendapatkan Pengguna Sekarang
+```http
+GET /api/users/me
+Authorization: Bearer <token>
 ```
 
-## Tailwind
-Pasang Node.js pada sistemu terlebih dahulu
-- https://nodejs.org/en/download
-
-Terlebih dahulu pasang dependensinya
-```
-$ npm install
+#### Mendapatkan pengguna dengan id
+```http
+GET /api/users/:id
+Authorization: Bearer <token>
 ```
 
-Untuk membangun cssnya, jalankan perintah berikut
+#### Memperbarui pengguna
+```http
+PUT /api/users/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "John Updated"
+}
 ```
-$ npm run dev:css
+
+#### Menghapus pengguna
+```http
+DELETE /api/users/:id
+Authorization: Bearer <token>
 ```
