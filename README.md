@@ -2,8 +2,9 @@
 
 ## 🚀 Quick Start
 
-Sebelumnya untuk reproduksi lokal buatlah kontainer database menggunakan docker, podman, atau semacamnya. Dengan opsi variabel berikut
 - https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/
+
+Sebelumnya untuk reproduksi lokal buatlah kontainer database menggunakan docker, podman, atau semacamnya. Dengan opsi variabel berikut
 
 ```env
 POSTGRES_USER=myuser
@@ -21,6 +22,8 @@ go run main.go
 Jika anda menggunakan Visual Studio Code, gunakan fitur Run & Debug agar dapat mempermudah hidup masing masing tim Ayam Kampung 🙏. Dengan mengeksekusi tombol `F5`
 
 ## API
+
+Sebelumnya tambahkan `X-API-Key` pada header request. Yang memiliki nilai `123`.
 
 ### Autentikasi
 
