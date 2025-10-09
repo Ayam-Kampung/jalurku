@@ -18,6 +18,8 @@ Terakhir jalankan dengan:
 go run main.go
 ```
 
+Jika anda menggunakan Visual Studio Code, gunakan fitur Run & Debug agar dapat mempermudah hidup masing masing tim Ayam Kampung 🙏. Dengan mengeksekusi tombol `F5`
+
 ## API
 
 ### Autentikasi
