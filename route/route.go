@@ -24,7 +24,7 @@ func SetupRoutes(app *fiber.App) {
 	}))
 
 	// API Group
-	api := app.Group("/api", middleware.ApiKey())
+	api := app.Group("/api")
 	api.Use(limiter.New(limiter.Config{
 		Max:        80,
 		Expiration: 1 * time.Minute,
@@ -40,7 +40,7 @@ func SetupRoutes(app *fiber.App) {
 	// Auth routes (public)
 	auth := api.Group("/auth")
 	auth.Use(limiter.New(limiter.Config{
-		Max:        5,
+		Max:        10,
 		Expiration: 1 * time.Minute,
 		Storage:    database.RedisStore(),
 		LimitReached: func(c *fiber.Ctx) error {
@@ -65,6 +65,12 @@ func SetupRoutes(app *fiber.App) {
 	user.Get("/me", middleware.Protected(), controller.GetCurrentUser)
 	user.Put("/:id", middleware.Protected(), controller.UpdateUser)
 	user.Delete("/:id", middleware.Protected(), controller.DeleteUser)
+
+	angket := api.Group("/angket")
+	angket.Use(middleware.Optional())
+	angket.Post("/mulai", controller.StartAngket)
+	angket.Post("/submit", controller.SubmitJawaban)
+	angket.Post("/selesai", controller.FinishAngket)
 
 	// Rute Pertanyaan
 	pertanyaan := api.Group("/pertanyaan")
