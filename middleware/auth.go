@@ -5,20 +5,26 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
-	jwtware "github.com/gofiber/jwt/v3"
+	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Protected middleware untuk JWT authentication
+// Pengguna harus terdaftar dan terautentikasi melalui JWT
 func Protected() fiber.Handler {
 	return jwtware.New(jwtware.Config{
-		SigningKey:   []byte(config.Config("SECRET")),
+		SigningKey:  
+		jwtware.SigningKey{
+			Key: []byte(config.Config("SECRET")),
+		},
 		ErrorHandler: jwtError,
 		ContextKey:   "user",
+		// Sementara menggunaakan Token Bearer
+		TokenLookup:  "header:Authorization",
+		AuthScheme:   "Bearer",
 	})
 }
 
-// jwtError custom error handler untuk JWT
+// Error handler JWT buatan
 func jwtError(c *fiber.Ctx, err error) error {
 	if err.Error() == "Missing or malformed JWT" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -34,27 +40,23 @@ func jwtError(c *fiber.Ctx, err error) error {
 	})
 }
 
-// Middleware untuk authorization (hanya admin)
+// Apakah user memiliki role admin?
 func AdminOnly() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		user := c.Locals("user").(*jwt.Token)
 		claims := user.Claims.(jwt.MapClaims)
 		role := claims["role"].(string)
 
-		// Role admin
+		// Mengecek apakah user memiliki role admin atau tidak
 		if role != "admin" {
-			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-				"status":  "error",
-				"message": "Access denied. Admin only",
-				"data":    nil,
-			})
+			return c.SendStatus(fiber.StatusForbidden)
 		}
 
 		return c.Next()
 	}
 }
 
-// Harus menyediakan X-API-KEY di header
+// NOTE UNTUK FRONTEND: Harus menyediakan X-API-KEY di header
 func ApiKey() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		clientKey := c.Get("X-API-Key")
