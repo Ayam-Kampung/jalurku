@@ -3,6 +3,7 @@ package middleware
 import (
 	"jalurku/config"
 	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/contrib/jwt"
@@ -40,6 +41,41 @@ func jwtError(c *fiber.Ctx, err error) error {
 	})
 }
 
+func Optional() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var tokenStr string
+
+		// 🔍 1. Coba ambil dari Authorization header
+		authHeader := c.Get("Authorization")
+		if strings.HasPrefix(authHeader, "Bearer ") {
+			tokenStr = strings.TrimPrefix(authHeader, "Bearer ")
+		}
+
+		// 🍪 2. Kalau gak ada, coba ambil dari cookie "token"
+		if tokenStr == "" {
+			tokenStr = c.Cookies("token")
+		}
+
+		// ❌ Kalau dua-duanya kosong → lanjut (guest)
+		if tokenStr == "" {
+			return c.Next()
+		}
+
+		// ✅ 3. Parse token kalau ada
+		token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("SECRET")), nil
+		})
+
+		// Jika token valid → simpan di context
+		if err == nil && token.Valid {
+			c.Locals("user", token)
+		}
+
+		// Apapun hasilnya (valid / invalid / kosong) tetap lanjut
+		return c.Next()
+	}
+}
+
 // Apakah user memiliki role admin?
 func AdminOnly() fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -50,32 +86,6 @@ func AdminOnly() fiber.Handler {
 		// Mengecek apakah user memiliki role admin atau tidak
 		if role != "admin" {
 			return c.SendStatus(fiber.StatusForbidden)
-		}
-
-		return c.Next()
-	}
-}
-
-// NOTE UNTUK FRONTEND: Harus menyediakan X-API-KEY di header
-func ApiKey() fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		clientKey := c.Get("X-API-Key")
-		serverKey := os.Getenv("API_KEY")
-
-		if clientKey == "" {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"status": "error",
-				"error": "Missing API key",
-				"data": nil,
-			})
-		}
-
-		if clientKey != serverKey {
-			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-				"status": "error",
-				"error": "Invalid API key",
-				"data": nil,
-			})
 		}
 
 		return c.Next()
