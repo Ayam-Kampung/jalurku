@@ -14,7 +14,6 @@ type Jurusan struct {
 	Name	   	string         		`gorm:"type:varchar(50);unique;not null" json:"name"` 
 	CreatedAt  	time.Time
 	UpdatedAt  	time.Time
-	DeletedAt  	gorm.DeletedAt 		`gorm:"index"`
 
 	// Relasi
 	Pertanyaan  []Pertanyaan  		`gorm:"foreignKey:JurusanID"`
@@ -23,12 +22,12 @@ type Jurusan struct {
 
 // Bentuk pertanyaan yang berhubungan dengan jurusan
 type Pertanyaan struct {
-	ID        	int           		`gorm:"primaryKey;autoIncrement" json:"id"`
+	ID        	uuid.UUID           `gorm:"type:char(36);primaryKey" json:"id"`
 	Text      	string         		`gorm:"type:text;not null" json:"text"`
+	Image		string				`json:"image"`
 	JurusanID 	int            		`gorm:"not null" json:"jurusan_id"`
 	CreatedAt 	time.Time
 	UpdatedAt 	time.Time
-	DeletedAt 	gorm.DeletedAt 		`gorm:"index"`
 
 	Jurusan 	Jurusan 			`gorm:"foreignKey:JurusanID"`
 }
@@ -37,15 +36,19 @@ type Pertanyaan struct {
 type HasilAngket struct {
 	ID        	uuid.UUID      		`gorm:"type:char(36);primaryKey" json:"id"`
 	UserID    	uuid.UUID      		`gorm:"type:char(36);not null" json:"user_id"`
-	JurusanID 	uuid.UUID      		`gorm:"type:char(36);not null" json:"jurusan_id"`
-	TotalScore 	float64        		`gorm:"not null;default:0" json:"total_score"`
+	JurusanID 	int      		    `gorm:"not null" json:"jurusan_id"` // Ubah ke int
 	CreatedAt 	time.Time
 	UpdatedAt 	time.Time
 	DeletedAt 	gorm.DeletedAt 		`gorm:"index"`
 
 	User    	User    			`gorm:"foreignKey:UserID"`
 	Jurusan 	Jurusan 			`gorm:"foreignKey:JurusanID"`
+}
 
+type SubmitRequest struct {
+	SessionID       string `json:"session_id"`
+	QuestionID   string `json:"question_id"`
+	SelectedOption int   `json:"selected_option"`
 }
 
 // Tambahkan data Jurusan -> (1:PG, 2:RPL, 3:TKJ, 4:TJA)
