@@ -30,15 +30,14 @@ func main() {
 	// Auto migrate model
 	err := database.DB.AutoMigrate(
 		&model.User{},
-		&model.Category{},
-		&model.Question{},
-		&model.Option{},
-		&model.Reflection{},
-		&model.Answer{},
-		&model.CategoryScore{},
-		&model.Recommendation{},
-		&model.ScoreThreshold{},
+		&model.Pertanyaan{},
+		&model.Jurusan{},
+		&model.User{},
+		&model.HasilAngket{},
 	)
+
+	model.SeedJurusan(database.DB)
+
 	if err != nil {
 		log.Fatal("Failed to migrate database: ", err)
 	}
