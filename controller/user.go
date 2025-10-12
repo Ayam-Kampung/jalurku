@@ -328,46 +328,11 @@ func Register(c *fiber.Ctx) error {
 // USER HANDLERS
 // ============================================
 
-// Dapatkan pengguna dengan id
-func GetUser(c *fiber.Ctx) error {
-	id := c.Params("id")
-	userID, err := uuid.Parse(id)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Invalid user ID",
-			"data":    nil,
-		})
-	}
-
-	db := database.DB
-	var user model.User
-	if err := db.First(&user, userID).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"status":  "error",
-				"message": "User not found",
-				"data":    nil,
-			})
-		}
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Database error",
-			"data":    err.Error(),
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"status":  "success",
-		"message": "User found",
-		"data":    user,
-	})
-}
-
 // Dapatkan pengguna sekarang yang ter-autentikasi (Log Masuk)
 func GetCurrentUser(c *fiber.Ctx) error {
 	token := c.Locals("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
+
 	userID, err := uuid.Parse(claims["user_id"].(string))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -377,9 +342,14 @@ func GetCurrentUser(c *fiber.Ctx) error {
 		})
 	}
 
-	db := database.DB
 	var user model.User
-	if err := db.First(&user, userID).Error; err != nil {
+	db := database.DB
+
+	if err := db.
+		Preload("HasilAngket", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
+		First(&user, "id = ?", userID).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"status":  "error",
 			"message": "User not found",
@@ -387,12 +357,13 @@ func GetCurrentUser(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":  "success",
 		"message": "User found",
 		"data":    user,
 	})
 }
+
 
 // Memperbarui pengguna
 func UpdateUser(c *fiber.Ctx) error {
@@ -523,5 +494,26 @@ func DeleteUser(c *fiber.Ctx) error {
 		"status":  "success",
 		"message": "User successfully deleted",
 		"data":    nil,
+	})
+}
+
+func IsAdmin(c *fiber.Ctx) error {
+	// Ambil token JWT dari context (middleware Protected)
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+
+	role, ok := claims["role"].(string)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Role not found in token",
+		})
+	}
+
+	isAdmin := role == "admin"
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  "success",
+		"is_admin": isAdmin,
 	})
 }
