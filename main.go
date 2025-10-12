@@ -43,12 +43,6 @@ func main() {
 	}
 	log.Println("✅ Database migration completed")
 
-	// // Run seeder if flag is set
-	// if *seed {
-	// 	database.SeedDatabase()
-	// 	return
-	// }
-
 	// Create Fiber app with production-ready config
 	app := fiber.New(fiber.Config{
 		ErrorHandler:          customErrorHandler,
