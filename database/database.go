@@ -63,7 +63,7 @@ func connectPostgres() (*gorm.DB, error) {
 			sslmode := os.Getenv("DB_SSLMODE")
 			
 			if sslmode == "" {
-				sslmode = "require" // Default untuk production
+				sslmode = "disable" // disable karena tidak publik
 			}
 
 			dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
