@@ -60,8 +60,6 @@ func SetupRoutes(app *fiber.App) {
 			return c.SendStatus(fiber.StatusTooManyRequests)
 		},
 	}))
-	user.Get("/:id", controller.GetUser)
-	// Hanya pengguna terautentikasi
 	user.Get("/me", middleware.Protected(), controller.GetCurrentUser)
 	user.Put("/:id", middleware.Protected(), controller.UpdateUser)
 	user.Delete("/:id", middleware.Protected(), controller.DeleteUser)
@@ -99,5 +97,5 @@ func SetupRoutes(app *fiber.App) {
 			return c.SendStatus(fiber.StatusTooManyRequests)
 		},
 	}))
-	// admin.Get("/dashboard", controller.GetAdminDashboard)                    // Admin dashboard
+	admin.Get("/check", controller.IsAdmin)
 }
