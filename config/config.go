@@ -12,17 +12,17 @@ func LoadConfig() {
 	appEnv := os.Getenv("APP_ENV")
 	
 	if appEnv == "production" {
-		// Production: tidak perlu load .env, langsung pakai environment variables
-		log.Println("🌐 Running in PRODUCTION mode - using cloud environment variables")
+		// Production: tidak perlu load .env, langsung pakai variabel lingkungan
+		log.Println("🌐 Berjalan di mode PRODUKSI - menggunakan variabel lingkungan cloud")
 		return
 	}
 
 	// Development: load dari .env file
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("⚠️  No .env file found, using system environment variables")
+		log.Println("⚠️ Tidak ada .env, sebagai gantinya menggunakan variabel lingkungan sistem")
 	} else {
-		log.Println("✅ Configuration loaded from .env file")
+		log.Println("✅ Konfigurasi variabel lingkungan termuat")
 	}
 }
 
