@@ -43,8 +43,8 @@ type HasilAngket struct {
 	DeletedAt		gorm.DeletedAt	`gorm:"index"`
 
 	// Relasi Hasil Angket dengan Pengguna dan Jurusan
-	User			User			`gorm:"foreignKey:UserID"`
-	Jurusan			Jurusan			`gorm:"foreignKey:JurusanID"`
+	User			User			`gorm:"foreignKey:UserID" json:"-"`
+	Jurusan			Jurusan			`gorm:"foreignKey:JurusanID" json:"-"`
 }
 
 type SubmitRequest struct {
