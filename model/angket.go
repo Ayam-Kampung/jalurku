@@ -24,6 +24,7 @@ type Jurusan struct {
 type Pertanyaan struct {
 	ID				uuid.UUID		`gorm:"type:char(36);primaryKey" json:"id"`
 	Text			string			`gorm:"type:text;not null" json:"text"`
+	Meta			string			`gorm:"type:text" json:"meta"`
 	Image			string			`json:"image"`
 	JurusanID		int				`gorm:"not null" json:"jurusan_id"`
 	CreatedAt		time.Time
