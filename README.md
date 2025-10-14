@@ -1,6 +1,6 @@
 # Api Jalurku
 Sebuah angket sederhana menggunakan go fiber sebagai REST Api.
-## Manajemen User
+## Manajemen Pengguna
 ### Register/Mendaftar
 ```http
 POST /api/auth/register
@@ -105,7 +105,7 @@ Respon berupa id sesi, id sesi berguna agar jawaban pertanyaan dapat disimpan un
 ### 2. Pengambilan Pertanyaan angket/Handler Jawaban angket
 Pengambilan pertanyaannya diambil dari database. Pastikan frontend hanya fetching semua pertanyaan dari awal, dan disimpan di penyimpanan sementara frontend. Hingga selesai angket.
 ```http
-GET /api/pertanyaan/
+GET /api/pertanyaan/rand
 ```
 Respon dari server berupa `"data":[...]` kumpulan soal urutan random dari server, setiap pertanyaan akan ditampilkan di halaman berbeda. Misal pertanyaan `fcaba5da-1492-4f89-ab7a-47c0a013f049` di halaman pertama, `01444e0e-281c-4a46-9548-c8e0c117a59c` di halaman kedua, dst. Pada saat ganti halaman maka lakukan lah `POST /api/angket/submit`.
 ```http
@@ -189,7 +189,7 @@ Respon:
 }
 ```
 Proses ini dilanjutkan oleh pertanyaan kedua di `data: [..]`, dan setersnya... sampai semua pertanyaan di `data: [..]` sudah dijawab semua.
-### Mengakhiri Sesi angket
+### 3. Mengakhiri Sesi angket
 ```http
 POST /api/angket/selesai
 Content-Type: application/json
