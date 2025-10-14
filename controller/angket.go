@@ -240,6 +240,25 @@ func GetPertanyaans(c *fiber.Ctx) error {
 	})
 }
 
+func GetJurusan(c *fiber.Ctx) error {
+	db := database.DB
+	var jurusan []model.Jurusan
+
+	if err := db.Find(&jurusan).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"status":  "error",
+			"message": "jurusan_fetched_all_failed",
+			"error":   err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"status":  "success",
+		"message": "jurusan_fetched_all",
+		"data":    jurusan,
+	})
+}
+
 // GET: Dapatkan satu pertanyaan
 func GetPertanyaanByID(c *fiber.Ctx) error {
 	id := c.Params("id")
@@ -288,7 +307,7 @@ func CreatePertanyaan(c *fiber.Ctx) error {
 		input.ID = uuid.New()
 	}
 
-	if err := db.Create(&input).Error; err != nil {
+	if err := db.Preload("Jurusan").Create(&input).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"status":  "error",
 			"message": "pertanyaan_create_failed",
@@ -319,7 +338,7 @@ func UpdatePertanyaan(c *fiber.Ctx) error {
 	db := database.DB
 
 	// ✅ Gunakan Where agar UUID diperlakukan sebagai string, bukan angka
-	if err := db.Where("id = ?", id).First(&pertanyaan).Error; err != nil {
+	if err := db.Preload("Jurusan").Where("id = ?", id).First(&pertanyaan).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"status":  "error",
 			"message": "pertanyaan_update_notfound",
@@ -376,7 +395,7 @@ func DeletePertanyaan(c *fiber.Ctx) error {
 	db := database.DB
 
 	// ✅ Gunakan Where agar cocok untuk UUID
-	if err := db.Where("id = ?", id).First(&pertanyaan).Error; err != nil {
+	if err := db.Preload("Jurusan").Where("id = ?", id).First(&pertanyaan).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"status":  "error",
 			"message": "pertanyaan_delete_notfound",

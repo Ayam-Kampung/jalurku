@@ -15,7 +15,7 @@ import (
 func SetupRoutes(app *fiber.App) {
 
 	app.Use(limiter.New(limiter.Config{
-		Max:        100,
+		Max:        400,
 		Expiration: 1 * time.Minute,
 		Storage:    database.RedisStore(),
 		LimitReached: func(c *fiber.Ctx) error {
@@ -26,7 +26,7 @@ func SetupRoutes(app *fiber.App) {
 	// API Group
 	api := app.Group("/api")
 	api.Use(limiter.New(limiter.Config{
-		Max:        80,
+		Max:        400,
 		Expiration: 1 * time.Minute,
 		Storage:    database.RedisStore(),
 		LimitReached: func(c *fiber.Ctx) error {
@@ -40,7 +40,7 @@ func SetupRoutes(app *fiber.App) {
 	// Auth routes (public)
 	auth := api.Group("/auth")
 	auth.Use(limiter.New(limiter.Config{
-		Max:        10,
+		Max:        30,
 		Expiration: 1 * time.Minute,
 		Storage:    database.RedisStore(),
 		LimitReached: func(c *fiber.Ctx) error {
@@ -50,10 +50,14 @@ func SetupRoutes(app *fiber.App) {
 	auth.Post("/login", controller.Login)
 	auth.Post("/register", controller.Register)
 
+	// Jurusan
+	jurus := api.Group("/jurusan")
+	jurus.Get("/", controller.GetJurusan)
+
 	// User routes
 	user := api.Group("/user")
 	user.Use(limiter.New(limiter.Config{
-		Max:        80,
+		Max:        300,
 		Expiration: 1 * time.Minute,
 		Storage:    database.RedisStore(),
 		LimitReached: func(c *fiber.Ctx) error {
@@ -73,7 +77,7 @@ func SetupRoutes(app *fiber.App) {
 	// Rute Pertanyaan
 	pertanyaan := api.Group("/pertanyaan")
 	pertanyaan.Use(limiter.New(limiter.Config{
-		Max:        80,
+		Max:        300,
 		Expiration: 1 * time.Minute,
 		Storage:    database.RedisStore(),
 		LimitReached: func(c *fiber.Ctx) error {
@@ -91,7 +95,7 @@ func SetupRoutes(app *fiber.App) {
 	// Admin routes (protected + admin only)
 	admin := api.Group("/admin", middleware.Protected(), middleware.AdminOnly())
 	admin.Use(limiter.New(limiter.Config{
-		Max:        80,
+		Max:        400,
 		Expiration: 1 * time.Minute,
 		Storage:    database.RedisStore(),
 		LimitReached: func(c *fiber.Ctx) error {

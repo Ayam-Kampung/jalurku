@@ -14,10 +14,6 @@ type Jurusan struct {
 	Name			string			`gorm:"type:varchar(50);unique;not null" json:"name"` 
 	CreatedAt		time.Time
 	UpdatedAt		time.Time
-
-	// Relasi Jurusan dengan Pertanyaan dan Angket
-	Pertanyaan		[]Pertanyaan	`gorm:"foreignKey:JurusanID"`
-	HasilAngket		[]HasilAngket	`gorm:"foreignKey:JurusanID"`
 }
 
 // Bentuk pertanyaan yang berhubungan dengan jurusan
