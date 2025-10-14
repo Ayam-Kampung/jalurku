@@ -29,7 +29,7 @@ func StartAngket(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"message":    "Session angket dimulai",
+		"message":    "angket_started",
 		"session_id": sessionID,
 	})
 }
@@ -77,7 +77,7 @@ func SubmitJawaban(c *fiber.Ctx) error {
 	database.RedisClient.Expire(ctx, sessionKey, time.Hour)
 
 	return c.JSON(fiber.Map{
-		"message": "Jawaban tersimpan dan session diperpanjang",
+		"message": "jawaban_saved_temp",
 		"data":    req,
 	})
 }
@@ -186,12 +186,13 @@ func FinishAngket(c *fiber.Ctx) error {
 
 	// Kirim hasil akhir
 	return c.JSON(fiber.Map{
-		"message": "Angket selesai 🎯",
+		"message": "angket_finished",
 		"hasil": fiber.Map{
-			"session_id":          req.SessionID,
-			"jurusan_terbaik":  jurusanTerbaik.Name,
-			"total_skor":       maxScore,
-			"detail_skor":      skorJurusan,
+			"session_id":       	req.SessionID,
+			"jurusan_terbaik":  	jurusanTerbaik.Name,
+			"jurusan_terbaik_id":  	jurusanTerbaik.ID,
+			"total_skor":       	maxScore,
+			"detail_skor":      	skorJurusan,
 		},
 	})
 }
@@ -206,14 +207,14 @@ func GetRandPertanyaans(c *fiber.Ctx) error {
 		Find(&pertanyaan).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Gagal mengambil data pertanyaan",
+			"message": "pertanyaan_fetched_allrand_failed",
 			"error":   err.Error(),
 		})
 	}
 
 	return c.JSON(fiber.Map{
 		"status":  "success",
-		"message": "Berhasil mengambil semua ID pertanyaan (acak)",
+		"message": "pertanyaan_fetched_allrand",
 		"data":    pertanyaan,
 	})
 }
@@ -227,7 +228,7 @@ func GetPertanyaans(c *fiber.Ctx) error {
 		Find(&pertanyaan).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Gagal mengambil data pertanyaan",
+			"message": "pertanyaan_fetched_all_failed",
 			"error":   err.Error(),
 		})
 	}
@@ -251,14 +252,14 @@ func GetPertanyaanByID(c *fiber.Ctx) error {
 
 		return c.Status(404).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Pertanyaan tidak ditemukan",
+			"message": "pertanyaan_fetched_failed",
 			"error":   err.Error(),
 		})
 	}
 
 	return c.JSON(fiber.Map{
 		"status":  "success",
-		"message": "Berhasil mengambil data pertanyaan",
+		"message": "pertanyaan_fetched",
 		"data":    pertanyaan,
 	})
 }
@@ -271,7 +272,7 @@ func CreatePertanyaan(c *fiber.Ctx) error {
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Gagal membaca input",
+			"message": "pertanyaan_create_input_failed",
 			"error":   err.Error(),
 		})
 	}
@@ -279,7 +280,7 @@ func CreatePertanyaan(c *fiber.Ctx) error {
 	if input.Text == "" {
 		return c.Status(400).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Teks dan JurusanID wajib diisi",
+			"message": "pertanyaan_input_insufficient",
 		})
 	}
 
@@ -290,14 +291,14 @@ func CreatePertanyaan(c *fiber.Ctx) error {
 	if err := db.Create(&input).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Gagal membuat pertanyaan",
+			"message": "pertanyaan_create_failed",
 			"error":   err.Error(),
 		})
 	}
 
 	return c.Status(201).JSON(fiber.Map{
 		"status":  "success",
-		"message": "Pertanyaan berhasil dibuat",
+		"message": "pertanyaan_create",
 		"data":    input,
 	})
 }
@@ -310,7 +311,7 @@ func UpdatePertanyaan(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Format ID tidak valid (bukan UUID)",
+			"message": "pertanyaan_update_uuid_failed",
 		})
 	}
 
@@ -321,7 +322,7 @@ func UpdatePertanyaan(c *fiber.Ctx) error {
 	if err := db.Where("id = ?", id).First(&pertanyaan).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Pertanyaan tidak ditemukan",
+			"message": "pertanyaan_update_notfound",
 			"error":   err.Error(),
 		})
 	}
@@ -330,7 +331,7 @@ func UpdatePertanyaan(c *fiber.Ctx) error {
 	if err := c.BodyParser(&updateData); err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Gagal membaca input",
+			"message": "pertanyaan_update_input_failed",
 			"error":   err.Error(),
 		})
 	}
@@ -346,14 +347,14 @@ func UpdatePertanyaan(c *fiber.Ctx) error {
 	if err := db.Save(&pertanyaan).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Gagal memperbarui pertanyaan",
+			"message": "pertanyaan_update_failed",
 			"error":   err.Error(),
 		})
 	}
 
 	return c.JSON(fiber.Map{
 		"status":  "success",
-		"message": "Pertanyaan berhasil diperbarui",
+		"message": "pertanyaan_update",
 		"data":    pertanyaan,
 	})
 }
@@ -367,7 +368,7 @@ func DeletePertanyaan(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Format ID tidak valid (bukan UUID)",
+			"message": "pertanyaan_delete_uuid_failed",
 		})
 	}
 
@@ -378,7 +379,7 @@ func DeletePertanyaan(c *fiber.Ctx) error {
 	if err := db.Where("id = ?", id).First(&pertanyaan).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Pertanyaan tidak ditemukan",
+			"message": "pertanyaan_delete_notfound",
 			"error":   err.Error(),
 		})
 	}
@@ -386,7 +387,7 @@ func DeletePertanyaan(c *fiber.Ctx) error {
 	if err := db.Delete(&pertanyaan).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Gagal menghapus pertanyaan",
+			"message": "pertanyaan_delete_failed",
 			"error":   err.Error(),
 		})
 	}

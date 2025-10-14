@@ -120,7 +120,7 @@ func Login(c *fiber.Ctx) error {
 	if string(c.Request().Header.ContentType()) != "application/json" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Content-Type must be application/json",
+			"message": "identity_type_failed",
 			"data":    nil,
 		})
 	}
@@ -129,7 +129,7 @@ func Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Invalid JSON format",
+			"message": "identity_type_json_failed",
 			"data":    err.Error(),
 		})
 	}
@@ -138,7 +138,7 @@ func Login(c *fiber.Ctx) error {
 	if input.Identity == "" || input.Password == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Identity and password are required",
+			"message": "identity_input_insufficient",
 			"data":    nil,
 		})
 	}
@@ -157,7 +157,7 @@ func Login(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Internal Server Error",
+			"message": "internal_server_error",
 			"data":    err.Error(),
 		})
 	}
@@ -167,7 +167,7 @@ func Login(c *fiber.Ctx) error {
 		CheckPasswordHash(pass, "")
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Invalid identity or password",
+			"message": "identity_invalid",
 			"data":    nil,
 		})
 	}
@@ -175,7 +175,7 @@ func Login(c *fiber.Ctx) error {
 	if !CheckPasswordHash(pass, userModel.Password) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Invalid identity or password",
+			"message": "identity_invalid",
 			"data":    nil,
 		})
 	}
@@ -192,7 +192,7 @@ func Login(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Could not generate token",
+			"message": "identity_jwt_token_failed",
 			"data":    nil,
 		})
 	}
@@ -206,7 +206,7 @@ func Login(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"status":  "success",
-		"message": "Success login",
+		"message": "login",
 		"data": fiber.Map{
 			"token": t,
 			"user":  userData,
@@ -233,7 +233,7 @@ func Register(c *fiber.Ctx) error {
 	if string(c.Request().Header.ContentType()) != "application/json" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Content-Type must be application/json",
+			"message": "identity_type_invalid",
 			"data":    nil,
 		})
 	}
@@ -243,7 +243,7 @@ func Register(c *fiber.Ctx) error {
 	if err := c.BodyParser(input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Invalid JSON format",
+			"message": "identity_type_json_invalid",
 			"data":    err.Error(),
 		})
 	}
@@ -252,7 +252,7 @@ func Register(c *fiber.Ctx) error {
 	if input.Name == "" || input.Email == "" || input.Password == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Name, email, and password are required",
+			"message": "identity_input_insufficient",
 			"data":    nil,
 		})
 	}
@@ -260,7 +260,7 @@ func Register(c *fiber.Ctx) error {
 	if len(input.Password) < 6 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Password must be at least 6 characters",
+			"message": "identity_input_password_insufficient",
 			"data":    nil,
 		})
 	}
@@ -268,7 +268,7 @@ func Register(c *fiber.Ctx) error {
 	if !isEmail(input.Email) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Invalid email format",
+			"message": "identity_input_email_insufficient",
 			"data":    nil,
 		})
 	}
@@ -279,7 +279,7 @@ func Register(c *fiber.Ctx) error {
 	if err := db.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Email already registered",
+			"message": "identity_conflict",
 			"data":    nil,
 		})
 	}
@@ -289,7 +289,7 @@ func Register(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Couldn't hash password",
+			"message": "internal_password_failed",
 			"data":    err.Error(),
 		})
 	}
@@ -305,7 +305,7 @@ func Register(c *fiber.Ctx) error {
 	if err := db.Create(&user).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Couldn't create user",
+			"message": "user_created_failed",
 			"data":    err.Error(),
 		})
 	}
@@ -319,7 +319,7 @@ func Register(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"status":  "success",
-		"message": "User created successfully",
+		"message": "user_created",
 		"data":    newUser,
 	})
 }
@@ -337,7 +337,7 @@ func GetCurrentUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Invalid user ID in token",
+			"message": "identity_token_failed",
 			"data":    nil,
 		})
 	}
@@ -352,14 +352,14 @@ func GetCurrentUser(c *fiber.Ctx) error {
 		First(&user, "id = ?", userID).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"status":  "error",
-			"message": "User not found",
+			"message": "identity_notfound",
 			"data":    nil,
 		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":  "success",
-		"message": "User found",
+		"message": "identity",
 		"data":    user,
 	})
 }
@@ -377,7 +377,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	if !validToken(token, id) {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Unauthorized to update this user",
+			"message": "internal_unauthorized",
 			"data":    nil,
 		})
 	}
@@ -386,7 +386,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Review your input",
+			"message": "upduser_input_invalid",
 			"data":    err.Error(),
 		})
 	}
@@ -395,7 +395,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Invalid user ID",
+			"message": "upduser_id_invalid",
 			"data":    nil,
 		})
 	}
@@ -405,7 +405,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	if err := db.First(&user, userID).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"status":  "error",
-			"message": "User not found",
+			"message": "upduser_notfound",
 			"data":    nil,
 		})
 	}
@@ -417,14 +417,14 @@ func UpdateUser(c *fiber.Ctx) error {
 	if err := db.Save(&user).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Couldn't update user",
+			"message": "upduser_failed",
 			"data":    err.Error(),
 		})
 	}
 
 	return c.JSON(fiber.Map{
 		"status":  "success",
-		"message": "User successfully updated",
+		"message": "upduser",
 		"data":    user,
 	})
 }
@@ -441,7 +441,7 @@ func DeleteUser(c *fiber.Ctx) error {
 	if !validToken(token, id) {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Unauthorized to delete this user",
+			"message": "internal_unauthorized",
 			"data":    nil,
 		})
 	}
@@ -450,7 +450,7 @@ func DeleteUser(c *fiber.Ctx) error {
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Review your input",
+			"message": "deluser_input_invalid",
 			"data":    err.Error(),
 		})
 	}
@@ -458,7 +458,7 @@ func DeleteUser(c *fiber.Ctx) error {
 	if !validUser(id, input.Password) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Invalid password",
+			"message": "deluser_input_password_invalid",
 			"data":    nil,
 		})
 	}
@@ -467,7 +467,7 @@ func DeleteUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Invalid user ID",
+			"message": "deluser_id_invalid",
 			"data":    nil,
 		})
 	}
@@ -477,7 +477,7 @@ func DeleteUser(c *fiber.Ctx) error {
 	if err := db.First(&user, userID).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"status":  "error",
-			"message": "User not found",
+			"message": "deluser_notfound",
 			"data":    nil,
 		})
 	}
@@ -485,14 +485,14 @@ func DeleteUser(c *fiber.Ctx) error {
 	if err := db.Delete(&user).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Couldn't delete user",
+			"message": "deluser_failed",
 			"data":    err.Error(),
 		})
 	}
 
 	return c.JSON(fiber.Map{
 		"status":  "success",
-		"message": "User successfully deleted",
+		"message": "deluser",
 		"data":    nil,
 	})
 }
@@ -506,7 +506,7 @@ func IsAdmin(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"status":  "error",
-			"message": "Role not found in token",
+			"message": "internal_unauthorized",
 		})
 	}
 
