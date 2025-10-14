@@ -196,17 +196,14 @@ func FinishAngket(c *fiber.Ctx) error {
 	})
 }
 
-// GET: Dapatkan banyak pertanyaan
-func GetPertanyaans(c *fiber.Ctx) error {
-	var ids []uuid.UUID // atau []int, tergantung tipe ID kamu
-
+// GET: Dapatkan banyak pertanyaan secara acak
+func GetRandPertanyaans(c *fiber.Ctx) error {
 	db := database.DB
+	var pertanyaan []model.Pertanyaan
 
-	// Ambil hanya kolom id dan acak urutannya
-	if err := db.Model(&model.Pertanyaan{}).
-		Select("id").
+	if err := db.Preload("Jurusan").
 		Order("RANDOM()").
-		Pluck("id", &ids).Error; err != nil {
+		Find(&pertanyaan).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"status":  "error",
 			"message": "Gagal mengambil data pertanyaan",
@@ -217,10 +214,30 @@ func GetPertanyaans(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"status":  "success",
 		"message": "Berhasil mengambil semua ID pertanyaan (acak)",
-		"data":    ids,
+		"data":    pertanyaan,
 	})
 }
 
+// GET: Dapatkan banyak pertanyaan secara urut
+func GetPertanyaans(c *fiber.Ctx) error {
+	db := database.DB
+	var pertanyaan []model.Pertanyaan
+
+	if err := db.Preload("Jurusan").
+		Find(&pertanyaan).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Gagal mengambil data pertanyaan",
+			"error":   err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"status":  "success",
+		"message": "pertanyaan_fetched_all",
+		"data":    pertanyaan,
+	})
+}
 
 // GET: Dapatkan satu pertanyaan
 func GetPertanyaanByID(c *fiber.Ctx) error {

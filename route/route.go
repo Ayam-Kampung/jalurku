@@ -80,6 +80,7 @@ func SetupRoutes(app *fiber.App) {
 			return c.SendStatus(fiber.StatusTooManyRequests)
 		},
 	}))
+	pertanyaan.Get("/rand", controller.GetRandPertanyaans)
 	pertanyaan.Get("/", controller.GetPertanyaans)
 	pertanyaan.Get("/:id", controller.GetPertanyaanByID)
 	// Hanya Admin
