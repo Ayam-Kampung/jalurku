@@ -89,6 +89,7 @@ func SetupRoutes(app *fiber.App) {
 	pertanyaan.Get("/:id", controller.GetPertanyaanByID)
 	// Hanya Admin
 	pertanyaan.Post("/", middleware.Protected(), middleware.AdminOnly(), controller.CreatePertanyaan)
+	pertanyaan.Post("/bulk", middleware.Protected(), middleware.AdminOnly(), controller.CreatePertanyaanBulk)
 	pertanyaan.Put("/:id", middleware.Protected(), middleware.AdminOnly(), controller.UpdatePertanyaan)
 	pertanyaan.Delete("/:id", middleware.Protected(), middleware.AdminOnly(), controller.DeletePertanyaan)
 

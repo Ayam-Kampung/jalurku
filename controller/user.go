@@ -364,7 +364,6 @@ func GetCurrentUser(c *fiber.Ctx) error {
 	})
 }
 
-
 // Memperbarui pengguna
 func UpdateUser(c *fiber.Ctx) error {
 	type UpdateUserInput struct {

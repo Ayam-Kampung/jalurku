@@ -12,7 +12,7 @@ type User struct {
 	ID        	uuid.UUID      	`gorm:"type:char(36);primaryKey"`
 	Name      	string         	`gorm:"type:varchar(100);not null"`
 	Email     	string         	`gorm:"type:varchar(100);unique;not null"`
-	Password  	string         	`gorm:"type:varchar(255);not null"`
+	Password  	string         	`gorm:"type:varchar(255);not null" json:"-"`
 	Role      	string         	`gorm:"type:varchar(20);default:'user'"`
 	CreatedAt 	time.Time
 	UpdatedAt 	time.Time

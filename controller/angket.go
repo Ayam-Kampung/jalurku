@@ -322,6 +322,152 @@ func CreatePertanyaan(c *fiber.Ctx) error {
 	})
 }
 
+type BulkPertanyaanInput struct {
+	Pertanyaan []model.Pertanyaan `json:"pertanyaan"`
+}
+
+func CreatePertanyaanBulk(c *fiber.Ctx) error {
+	var input BulkPertanyaanInput
+	db := database.DB
+
+	// Parse input
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"status":  "error",
+			"message": "pertanyaan_bulk_create_input_failed",
+			"error":   err.Error(),
+		})
+	}
+
+	// Validasi: harus ada tepat 4 pertanyaan
+	if len(input.Pertanyaan) != 4 {
+		return c.Status(400).JSON(fiber.Map{
+			"status":  "error",
+			"message": "pertanyaan_must_be_4",
+			"error":   "Harus ada tepat 4 pertanyaan (satu untuk setiap jurusan)",
+		})
+	}
+
+	// Ambil semua jurusan yang tersedia
+	var jurusanList []model.Jurusan
+	if err := db.Find(&jurusanList).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"status":  "error",
+			"message": "jurusan_fetch_failed",
+			"error":   err.Error(),
+		})
+	}
+
+	// Validasi: harus ada tepat 4 jurusan
+	if len(jurusanList) != 4 {
+		return c.Status(500).JSON(fiber.Map{
+			"status":  "error",
+			"message": "jurusan_count_invalid",
+			"error":   "Database harus memiliki tepat 4 jurusan",
+		})
+	}
+
+	// Buat map untuk track jurusan yang sudah diisi
+	jurusanMap := make(map[int]bool)
+	for _, j := range jurusanList {
+		jurusanMap[j.ID] = false
+	}
+
+	// Validasi setiap pertanyaan
+	var validatedPertanyaan []model.Pertanyaan
+	for i, p := range input.Pertanyaan {
+		// Validasi text tidak kosong
+		if p.Text == "" {
+			return c.Status(400).JSON(fiber.Map{
+				"status":  "error",
+				"message": "pertanyaan_text_empty",
+				"error":   "Pertanyaan ke-" + string(rune(i+1)) + " tidak boleh kosong",
+			})
+		}
+
+		// Validasi jurusan_id valid
+		if _, exists := jurusanMap[p.JurusanID]; !exists {
+			return c.Status(400).JSON(fiber.Map{
+				"status":  "error",
+				"message": "jurusan_id_invalid",
+				"error":   "Jurusan ID tidak valid: " + string(rune(p.JurusanID)),
+			})
+		}
+
+		// Validasi tidak ada duplikat jurusan_id
+		if jurusanMap[p.JurusanID] {
+			return c.Status(400).JSON(fiber.Map{
+				"status":  "error",
+				"message": "jurusan_duplicate",
+				"error":   "Jurusan ID duplikat ditemukan: " + string(rune(p.JurusanID)),
+			})
+		}
+
+		// Mark jurusan sebagai sudah diisi
+		jurusanMap[p.JurusanID] = true
+
+		// Generate UUID jika belum ada
+		if p.ID == uuid.Nil {
+			p.ID = uuid.New()
+		}
+
+		validatedPertanyaan = append(validatedPertanyaan, p)
+	}
+
+	// Validasi semua jurusan sudah terisi
+	for jurusanID, filled := range jurusanMap {
+		if !filled {
+			return c.Status(400).JSON(fiber.Map{
+				"status":  "error",
+				"message": "jurusan_missing",
+				"error":   "Pertanyaan untuk Jurusan ID " + string(rune(jurusanID)) + " belum diisi",
+			})
+		}
+	}
+
+	// Simpan semua pertanyaan dalam satu transaksi
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	for i := range validatedPertanyaan {
+		if err := tx.Create(&validatedPertanyaan[i]).Error; err != nil {
+			tx.Rollback()
+			return c.Status(500).JSON(fiber.Map{
+				"status":  "error",
+				"message": "pertanyaan_create_failed",
+				"error":   err.Error(),
+			})
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"status":  "error",
+			"message": "pertanyaan_commit_failed",
+			"error":   err.Error(),
+		})
+	}
+
+	// Reload dengan relasi Jurusan
+	var createdPertanyaan []model.Pertanyaan
+	ids := make([]uuid.UUID, len(validatedPertanyaan))
+	for i, p := range validatedPertanyaan {
+		ids[i] = p.ID
+	}
+	db.Preload("Jurusan").Where("id IN ?", ids).Find(&createdPertanyaan)
+
+	return c.Status(201).JSON(fiber.Map{
+		"status":  "success",
+		"message": "pertanyaan_bulk_create_success",
+		"data":    createdPertanyaan,
+		"count":   len(createdPertanyaan),
+	})
+}
+
 func UpdatePertanyaan(c *fiber.Ctx) error {
 	idParam := c.Params("id")
 
@@ -362,6 +508,9 @@ func UpdatePertanyaan(c *fiber.Ctx) error {
 	if updateData.JurusanID != 0 {
 		pertanyaan.JurusanID = updateData.JurusanID
 	}
+	// 👇 TAMBAHKAN INI
+	pertanyaan.Meta = updateData.Meta     // Meta boleh kosong
+	pertanyaan.Image = updateData.Image   // Image boleh kosong
 
 	if err := db.Save(&pertanyaan).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
