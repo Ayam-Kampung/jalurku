@@ -1,5 +1,5 @@
-# Api Jalurku
-Sebuah angket sederhana menggunakan go fiber sebagai REST Api.
+# API Jalurku
+Sebuah angket sederhana menggunakan go fiber sebagai REST API.
 ## Manajemen Pengguna
 ### Register/Mendaftar
 ```http
