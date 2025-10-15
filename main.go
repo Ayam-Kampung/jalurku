@@ -72,10 +72,10 @@ func main() {
 
 	// CORS middleware
 	corsConfig := cors.Config{
-		AllowOrigins:     "http://localhost:5173", // URL frontend Vite
-        AllowCredentials: true,
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
-		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
+		AllowOrigins:     	os.Getenv("ALLOW_ORIGINS"), // URL frontend Vite
+        AllowCredentials: 	true,
+		AllowHeaders: 		"Origin, Content-Type, Accept, Authorization",
+		AllowMethods: 		"GET, POST, PUT, DELETE, OPTIONS",
 	}
 
 	// Production CORS (more restrictive)
