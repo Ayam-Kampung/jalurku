@@ -72,18 +72,10 @@ func main() {
 
 	// CORS middleware
 	corsConfig := cors.Config{
-		AllowOrigins:     	os.Getenv("ALLOW_ORIGINS"), // URL frontend Vite
+		AllowOrigins:     	os.Getenv("ALLOW_ORIGINS"),
         AllowCredentials: 	true,
 		AllowHeaders: 		"Origin, Content-Type, Accept, Authorization",
 		AllowMethods: 		"GET, POST, PUT, DELETE, OPTIONS",
-	}
-
-	// Production CORS (more restrictive)
-	if config.IsProduction() {
-		allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
-		if allowedOrigins != "" {
-			corsConfig.AllowOrigins = allowedOrigins
-		}
 	}
 
 	app.Use(cors.New(corsConfig))
