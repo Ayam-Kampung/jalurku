@@ -105,9 +105,11 @@ func main() {
 
 	if config.IsProduction() {
 		log.Printf("🚀 Server running in PRODUCTION mode on port %s", port)
+		log.Println("ALLOWED ORIGINS: " + os.Getenv("ALLOW_ORIGINS"))
 	} else {
 		log.Printf("🚀 Server running in DEVELOPMENT mode on http://localhost:%s", port)
 		log.Println("📚 API Documentation: http://localhost:" + port + "/api")
+		log.Println("ALLOWED ORIGINS: " + os.Getenv("ALLOW_ORIGINS"))
 	}
 
 	log.Fatal(app.Listen(":" + port))
