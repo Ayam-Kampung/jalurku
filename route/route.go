@@ -5,103 +5,56 @@ import (
 
 	"jalurku/controller"
 	"jalurku/middleware"
-	"jalurku/database"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
-// SetupRoutes setup all application routes
+// Menyetel semua rute REST API
 func SetupRoutes(app *fiber.App) {
 
-	app.Use(limiter.New(limiter.Config{
-		Max:        400,
-		Expiration: 1 * time.Minute,
-		Storage:    database.RedisStore(),
-		LimitReached: func(c *fiber.Ctx) error {
-			return c.SendStatus(fiber.StatusTooManyRequests)
-		},
-	}))
+	app.Use(middleware.DefaultLimiter())
 
-	// API Group
+	// Kelompokkan menjadi /api
 	api := app.Group("/api")
-	api.Use(limiter.New(limiter.Config{
-		Max:        400,
-		Expiration: 1 * time.Minute,
-		Storage:    database.RedisStore(),
-		LimitReached: func(c *fiber.Ctx) error {
-			return c.SendStatus(fiber.StatusTooManyRequests)
-		},
-	}))
 
-	// Health check
+	// Ini buat apa si yah?
 	api.Get("/", controller.Hello)
 
-	// Auth routes (public)
+	// Rute: Autentikasi
 	auth := api.Group("/auth")
-	auth.Use(limiter.New(limiter.Config{
-		Max:        30,
-		Expiration: 1 * time.Minute,
-		Storage:    database.RedisStore(),
-		LimitReached: func(c *fiber.Ctx) error {
-			return c.SendStatus(fiber.StatusTooManyRequests)
-		},
-	}))
+	auth.Use(middleware.EnforcedLimiter(5, 5*time.Minute, "auth"))
 	auth.Post("/login", controller.Login)
 	auth.Post("/register", controller.Register)
 
-	// Jurusan
+	// Rute: Jurusan
 	jurus := api.Group("/jurusan")
 	jurus.Get("/", controller.GetJurusan)
 
-	// User routes
+	// Rute: Pengguna
 	user := api.Group("/user")
-	user.Use(limiter.New(limiter.Config{
-		Max:        300,
-		Expiration: 1 * time.Minute,
-		Storage:    database.RedisStore(),
-		LimitReached: func(c *fiber.Ctx) error {
-			return c.SendStatus(fiber.StatusTooManyRequests)
-		},
-	}))
 	user.Get("/me", middleware.Protected(), controller.GetCurrentUser)
 	user.Put("/:id", middleware.Protected(), controller.UpdateUser)
 	user.Delete("/:id", middleware.Protected(), controller.DeleteUser)
 
+	// Rute: Angket
 	angket := api.Group("/angket")
 	angket.Use(middleware.Optional())
 	angket.Post("/mulai", controller.StartAngket)
 	angket.Post("/submit", controller.SubmitJawaban)
 	angket.Post("/selesai", controller.FinishAngket)
 
-	// Rute Pertanyaan
+	// Rute: Pertanyaan
 	pertanyaan := api.Group("/pertanyaan")
-	pertanyaan.Use(limiter.New(limiter.Config{
-		Max:        300,
-		Expiration: 1 * time.Minute,
-		Storage:    database.RedisStore(),
-		LimitReached: func(c *fiber.Ctx) error {
-			return c.SendStatus(fiber.StatusTooManyRequests)
-		},
-	}))
 	pertanyaan.Get("/rand", controller.GetRandPertanyaans)
 	pertanyaan.Get("/", controller.GetPertanyaans)
 	pertanyaan.Get("/:id", controller.GetPertanyaanByID)
-	// Hanya Admin
+
+	// Rute: ytta
 	pertanyaan.Post("/", middleware.Protected(), middleware.AdminOnly(), controller.CreatePertanyaan)
-	pertanyaan.Post("/bulk", middleware.Protected(), middleware.AdminOnly(), controller.CreatePertanyaanBulk)
 	pertanyaan.Put("/:id", middleware.Protected(), middleware.AdminOnly(), controller.UpdatePertanyaan)
 	pertanyaan.Delete("/:id", middleware.Protected(), middleware.AdminOnly(), controller.DeletePertanyaan)
 
-	// Admin routes (protected + admin only)
+	// Rute: ngecek yang ytta
 	admin := api.Group("/admin", middleware.Protected(), middleware.AdminOnly())
-	admin.Use(limiter.New(limiter.Config{
-		Max:        400,
-		Expiration: 1 * time.Minute,
-		Storage:    database.RedisStore(),
-		LimitReached: func(c *fiber.Ctx) error {
-			return c.SendStatus(fiber.StatusTooManyRequests)
-		},
-	}))
 	admin.Get("/check", controller.IsAdmin)
 }
