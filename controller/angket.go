@@ -284,49 +284,11 @@ func GetPertanyaanByID(c *fiber.Ctx) error {
 }
 
 // POST: Membuat pertanyaan
-func CreatePertanyaan(c *fiber.Ctx) error {
-	var input model.Pertanyaan
-	db := database.DB
-
-	if err := c.BodyParser(&input); err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"status":  "error",
-			"message": "pertanyaan_create_input_failed",
-			"error":   err.Error(),
-		})
-	}
-
-	if input.Text == "" {
-		return c.Status(400).JSON(fiber.Map{
-			"status":  "error",
-			"message": "pertanyaan_input_insufficient",
-		})
-	}
-
-	if input.ID == uuid.Nil {
-		input.ID = uuid.New()
-	}
-
-	if err := db.Preload("Jurusan").Create(&input).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"status":  "error",
-			"message": "pertanyaan_create_failed",
-			"error":   err.Error(),
-		})
-	}
-
-	return c.Status(201).JSON(fiber.Map{
-		"status":  "success",
-		"message": "pertanyaan_create",
-		"data":    input,
-	})
-}
-
 type BulkPertanyaanInput struct {
 	Pertanyaan []model.Pertanyaan `json:"pertanyaan"`
 }
 
-func CreatePertanyaanBulk(c *fiber.Ctx) error {
+func CreatePertanyaan(c *fiber.Ctx) error {
 	var input BulkPertanyaanInput
 	db := database.DB
 
