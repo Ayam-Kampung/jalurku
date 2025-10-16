@@ -7,45 +7,42 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Memuat nilai variabel lingkungan
+// LoadConfig memuat variabel lingkungan
 func LoadConfig() {
 	appEnv := os.Getenv("APP_ENV")
 	
 	if appEnv == "production" {
-		// Production: tidak perlu load .env, langsung pakai variabel lingkungan
-		log.Println("🌐 Berjalan di mode PRODUKSI - menggunakan variabel lingkungan cloud")
+		log.Println("🌐 Running in PRODUCTION mode - using cloud environment variables")
 		return
 	}
 
 	// Development: load dari .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("⚠️ Tidak ada .env, sebagai gantinya menggunakan variabel lingkungan sistem")
+	if err := godotenv.Load(); err != nil {
+		log.Println("⚠️ No .env file found, using system environment variables")
 	} else {
-		log.Println("✅ Konfigurasi variabel lingkungan termuat")
+		log.Println("✅ Environment variables loaded from .env")
 	}
 }
 
-// Mengambil nilai variabel, nilai ke nilai
+// Config mengambil nilai variabel lingkungan
 func Config(key string) string {
 	return os.Getenv(key)
 }
 
-// Jika tidak ada nilai variabel lingkungan, maka gunakan defaultValue
+// ConfigWithDefault mengambil nilai variabel atau default jika kosong
 func ConfigWithDefault(key, defaultValue string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		return defaultValue
+	if value := os.Getenv(key); value != "" {
+		return value
 	}
-	return value
+	return defaultValue
 }
 
-// Apakah aplikasi berjalan di lingkungan produksi?
+// IsProduction mengecek apakah aplikasi berjalan di produksi
 func IsProduction() bool {
 	return os.Getenv("APP_ENV") == "production"
 }
 
-// Apakah aplikasi berjalan di lingkungan pengembangan?
+// IsDevelopment mengecek apakah aplikasi berjalan di development
 func IsDevelopment() bool {
 	return os.Getenv("APP_ENV") != "production"
 }

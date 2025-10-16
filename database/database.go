@@ -7,91 +7,45 @@ import (
 	"strconv"
 	"context"
 
-	"github.com/redis/go-redis/v9"
 	redisStorage "github.com/gofiber/storage/redis/v3"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-// DB is the database connection
-var DB *gorm.DB
+var (
+	DB          *gorm.DB
+	RedisClient *redis.Client
+)
 
 // ConnectDB establishes database connection
 func ConnectDB() {
-	var err error
-	dbDriver := os.Getenv("DB_DRIVER")
-	appEnv := os.Getenv("APP_ENV")
-	
-	if dbDriver == "" {
-		dbDriver = "sqlite" // Default to SQLite for easy setup
-	}
-
-	// Log environment
-	if appEnv == "production" {
-		log.Println("🌐 Environment: PRODUCTION (using cloud env variables)")
-	} else {
-		log.Println("💻 Environment: DEVELOPMENT (using .env file)")
-	}
-
-	DB, err = connectPostgres()
-
+	db, err := connectPostgres()
 	if err != nil {
-		log.Fatal("Failed to connect to database: ", err)
+		log.Fatal("❌ Failed to connect to database: ", err)
 	}
 
+	DB = db
 	log.Println("✅ Database connected successfully")
 }
 
 func connectPostgres() (*gorm.DB, error) {
 	var dsn string
-	appEnv := os.Getenv("APP_ENV")
 
-	if appEnv == "production" {
-		// Production: gunakan DATABASE_URL dari cloud (Railway, Heroku, dll)
-		databaseURL := os.Getenv("DATABASE_URL")
-		if databaseURL != "" {
-			dsn = databaseURL
-			log.Println("📦 Using DATABASE_URL from cloud environment")
-		} else {
-			// Fallback: compose from individual env vars
-			host := os.Getenv("DB_HOST")
-			port := os.Getenv("DB_PORT")
-			user := os.Getenv("DB_USER")
-			password := os.Getenv("DB_PASSWORD")
-			dbname := os.Getenv("DB_NAME")
-			sslmode := os.Getenv("DB_SSLMODE")
-			
-			if sslmode == "" {
-				sslmode = "disable" // disable karena tidak publik
-			}
-
-			dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-				host, port, user, password, dbname, sslmode)
-			log.Println("📦 Using composed connection string from cloud env")
-		}
+	// Prioritas DATABASE_URL (untuk cloud providers)
+	if databaseURL := os.Getenv("DATABASE_URL"); databaseURL != "" {
+		dsn = databaseURL
+		log.Println("📦 Using DATABASE_URL")
 	} else {
-		// Development: gunakan .env file
-		host := os.Getenv("DB_HOST")
-		port := os.Getenv("DB_PORT")
-		user := os.Getenv("DB_USER")
-		password := os.Getenv("DB_PASSWORD")
-		dbname := os.Getenv("DB_NAME")
-		sslmode := os.Getenv("DB_SSLMODE")
-
-		if sslmode == "" {
-			sslmode = "disable" // Default untuk development
-		}
-
-		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-			host, port, user, password, dbname, sslmode)
-		log.Println("📄 Using .env file for database connection")
+		dsn = buildDSN()
+		log.Println("📦 Using individual database env vars")
 	}
 
-	// Set logger mode based on environment
+	// Default ke logger.Info, override via env jika perlu
 	logMode := logger.Info
-	if appEnv == "production" {
-		logMode = logger.Error // Only log errors in production
+	if os.Getenv("DB_LOG_MODE") == "error" {
+		logMode = logger.Error
 	}
 
 	return gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -99,43 +53,58 @@ func connectPostgres() (*gorm.DB, error) {
 	})
 }
 
-// Caching menggunakan Redis biar keren
-var RedisClient *redis.Client
+// buildDSN membuat connection string dari env vars individual
+func buildDSN() string {
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+	sslmode := os.Getenv("DB_SSLMODE")
 
+	if sslmode == "" {
+		sslmode = "disable"
+	}
+
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbname, sslmode)
+}
+
+// RedisStore menginisialisasi koneksi Redis dan mengembalikan Fiber Storage
 func RedisStore() *redisStorage.Storage {
-    host := os.Getenv("REDIS_HOST")
-    port := os.Getenv("REDIS_PORT")
-    password := os.Getenv("REDIS_PASSWORD")
-    dbStr := os.Getenv("REDIS_DATABASE")
+	host := os.Getenv("REDIS_HOST")
+	port := os.Getenv("REDIS_PORT")
+	password := os.Getenv("REDIS_PASSWORD")
+	dbStr := os.Getenv("REDIS_DATABASE")
 
-    db, err := strconv.Atoi(dbStr)
-    if err != nil {
-        log.Fatalf("❌ Gagal mengonversi REDIS_DATABASE: %v", err)
-    }
+	db, err := strconv.Atoi(dbStr)
+	if err != nil {
+		log.Fatalf("❌ Failed to convert REDIS_DATABASE to int: %v", err)
+	}
 
-    addr := fmt.Sprintf("%s:%s", host, port)
+	addr := fmt.Sprintf("%s:%s", host, port)
 
-    // Inisialisasi Redis Client
-    RedisClient = redis.NewClient(&redis.Options{
-        Addr:     addr,
-        Password: password,
-        DB:       db,
-    })
+	// Inisialisasi Redis Client
+	RedisClient = redis.NewClient(&redis.Options{
+		Addr:     addr,
+		Password: password,
+		DB:       db,
+	})
 
-    // Test koneksi
-    ctx := context.Background()
-    if err := RedisClient.Ping(ctx).Err(); err != nil {
-        log.Printf("❌ Redis gagal terkoneksi ke %s: %v", addr, err)
-    } else {
-        log.Printf("✅ Redis terkoneksi di %s (DB %d)", addr, db)
-    }
+	// Test koneksi
+	ctx := context.Background()
+	if err := RedisClient.Ping(ctx).Err(); err != nil {
+		log.Printf("❌ Redis connection failed to %s: %v", addr, err)
+	} else {
+		log.Printf("✅ Redis connected at %s (DB %d)", addr, db)
+	}
 
-    // Return Fiber Storage
-    portInt, _ := strconv.Atoi(port)
-    return redisStorage.New(redisStorage.Config{
-        Host:     host,
-        Port:     portInt,
-        Password: password,
-        Database: db,
-    })
+	// Return Fiber Storage
+	portInt, _ := strconv.Atoi(port)
+	return redisStorage.New(redisStorage.Config{
+		Host:     host,
+		Port:     portInt,
+		Password: password,
+		Database: db,
+	})
 }
