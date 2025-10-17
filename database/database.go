@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"context"
 
-	redisStorage "github.com/gofiber/storage/redis/v3"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -70,8 +69,8 @@ func buildDSN() string {
 		host, port, user, password, dbname, sslmode)
 }
 
-// RedisStore menginisialisasi koneksi Redis dan mengembalikan Fiber Storage
-func RedisStore() *redisStorage.Storage {
+// ConnectRedis menginisialisasi Redis Client
+func ConnectRedis() {
 	host := os.Getenv("REDIS_HOST")
 	port := os.Getenv("REDIS_PORT")
 	password := os.Getenv("REDIS_PASSWORD")
@@ -94,17 +93,8 @@ func RedisStore() *redisStorage.Storage {
 	// Test koneksi
 	ctx := context.Background()
 	if err := RedisClient.Ping(ctx).Err(); err != nil {
-		log.Printf("❌ Redis connection failed to %s: %v", addr, err)
-	} else {
-		log.Printf("✅ Redis connected at %s (DB %d)", addr, db)
+		log.Fatalf("❌ Redis connection failed to %s: %v", addr, err)
 	}
-
-	// Return Fiber Storage
-	portInt, _ := strconv.Atoi(port)
-	return redisStorage.New(redisStorage.Config{
-		Host:     host,
-		Port:     portInt,
-		Password: password,
-		Database: db,
-	})
+	
+	log.Printf("✅ Redis connected at %s (DB %d)", addr, db)
 }
