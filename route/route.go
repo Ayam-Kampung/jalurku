@@ -1,8 +1,6 @@
 package route
 
 import (
-	"time"
-
 	"jalurku/controller"
 	"jalurku/middleware"
 
@@ -12,8 +10,6 @@ import (
 // Menyetel semua rute REST API
 func SetupRoutes(app *fiber.App) {
 
-	app.Use(middleware.DefaultLimiter())
-
 	// Kelompokkan menjadi /api
 	api := app.Group("/api")
 
@@ -22,7 +18,6 @@ func SetupRoutes(app *fiber.App) {
 
 	// Rute: Autentikasi
 	auth := api.Group("/auth")
-	auth.Use(middleware.EnforcedLimiter(5, 5*time.Minute, "auth"))
 	auth.Post("/login", controller.Login)
 	auth.Post("/register", controller.Register)
 
