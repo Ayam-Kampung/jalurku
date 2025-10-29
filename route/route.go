@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Menyetel semua rute REST API
+// Menyetel semua rute REST API jalurku
 func SetupRoutes(app *fiber.App) {
 
 	// Kelompokkan menjadi /api
