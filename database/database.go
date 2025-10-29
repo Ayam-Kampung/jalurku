@@ -43,7 +43,7 @@ func connectPostgres() (*gorm.DB, error) {
 
 	// Default ke logger.Info, override via env jika perlu
 	logMode := logger.Info
-	if os.Getenv("DB_LOG_MODE") == "error" {
+	if os.Getenv("DB_LOG_MODE") == "galat" {
 		logMode = logger.Error
 	}
 
